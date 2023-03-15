@@ -13,7 +13,7 @@ import os
 import sys
 import copy
 import codecs
-import urllib2
+import urllib.request as urllib2
 import argparse
 from lxml import etree
 
@@ -87,13 +87,21 @@ def print_node(node, strip_ns, f=sys.stdout):
     f: the file to print to (default is stdout)
     """
     if node.tag:
-        print >> f, "[%s]" %(chop_ns_prefix(node.tag) if strip_ns else node.tag),
+        # print >> f, "[%s]" %(chop_ns_prefix(node.tag) if strip_ns else node.tag),
+        # print("[%s]" %(chop_ns_prefix(node.tag) if strip_ns else node.tag), file=f)
+        print("[%s]" %(chop_ns_prefix(node.tag) if strip_ns else node.tag))
     if node.text:
-        print >> f, node.text.strip()
+        # print >> f, node.text.strip()
+        # print(node.text.strip().encode(), file=f)
+        print(node.text.strip())
     if node.attrib:
         for key in node.attrib:
-            print >> f, "(%s: %s)" %(key, node.attrib[key])
-        print >> f
+            # print >> f, "(%s: %s)" %(key, node.attrib[key])
+            # print(("(%s: %s)" %(key, node.attrib[key])).encode(), file=f)
+            print("(%s: %s)" %(key, node.attrib[key]))
+        # print >> f
+        # print(file=f)
+        print()
 
 
 def cvrf_validate(f, cvrf_doc):
@@ -266,7 +274,8 @@ def main(progname = None):
                 catalog = args.catalog if args.catalog else CVRF_Syntax.CVRF_CATALOG
                 os.environ.update(XML_CATALOG_FILES=catalog)
             else:
-                print >> sys.stderr, "Fetching schemata..."
+                # print >> sys.stderr, "Fetching schemata..."
+                print("Fetching schemata...", f=sys.stderr)
                 f = urllib2.urlopen(CVRF_Syntax.CVRF_SCHEMA)
         except IOError as e:
             sys.exit("{0}: I/O error({1}) \"{2}\": {3}".format(progname, e.errno, args.schema, e.strerror))
@@ -276,7 +285,8 @@ def main(progname = None):
         if code is False:
             sys.exit("{0}: {1}".format(progname, result))
         else:
-            print >> sys.stderr, result
+            # print >> sys.stderr, result
+            print(result, file=sys.stderr)
 
     cvrf_dispatch(cvrf_doc, parsables, collate_vuln=args.collate_vuln, strip_ns=args.strip_ns)
 
@@ -284,7 +294,7 @@ if __name__ == "__main__":
     progname=os.path.basename(sys.argv[0])
     try:
         main(progname)
-    except Exception, value:
+    except Exception as value:
         (exc_type, exc_value, exc_tb) = sys.exc_info()
         sys.excepthook(exc_type, exc_value, exc_tb)     # if debugging
         sys.exit("%s: %s: %s" % (progname, exc_type.__name__, exc_value))
