@@ -86,6 +86,8 @@ def print_node(node, strip_ns, f=sys.stdout):
     strip_ns: boolean that when true indicates the namespace prefix will be chomped
     f: the file to print to (default is stdout)
     """
+    print(etree.tostring(node, pretty_print=True))
+    # return
     if node.tag:
         # print >> f, "[%s]" %(chop_ns_prefix(node.tag) if strip_ns else node.tag),
         # print("[%s]" %(chop_ns_prefix(node.tag) if strip_ns else node.tag), file=f)
